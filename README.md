@@ -491,6 +491,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <br/>
 
-<sub>Architecture diagram and README generated with assistance from Claude · Anthropic</sub>
+<sub>Architecture diagram and README By Piyush Deshkar</sub>
 
 </div>
