@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: users
+    // Document ID: {userId}
+    // Fields: uid, displayName, email, photoURL, createdAt
+    //
+    // Collection: conversations
+    // Document ID: {conversationId}
+    // Fields: id, userId, title, createdAt, lastMessageAt
+    //
+    // Collection: conversations/{conversationId}/messages
+    // Document ID: {messageId}
+    // Fields: conversationId, role, content, timestamp, type
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+          (request.auth.token.email == "class11art@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid is string && data.uid.size() > 0 && data.uid.size() < 128 &&
+             data.email is string && data.email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$") &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100)) &&
+             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 500));
+    }
+
+    function isValidConversation(data) {
+      return data.keys().hasAll(['userId', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.createdAt is string &&
+             (!('title' in data) || (data.title is string && data.title.size() < 100));
+    }
+
+    function isValidMessage(data) {
+      return data.keys().hasAll(['conversationId', 'role', 'content', 'timestamp']) &&
+             data.role in ['user', 'model'] &&
+             data.content is string && data.content.size() < 10000 &&
+             data.conversationId is string && data.conversationId.size() < 128;
+    }
+
+    // Rules
+    match /users/{userId} {
+      allow read, write: if true; // Public for demo/guest mode
+    }
+
+    match /conversations/{conversationId} {
+      allow read, write: if true; // Public for demo/guest mode
+
+      match /messages/{messageId} {
+        allow read, write: if true; // Public for demo/guest mode
+      }
+    }
+  }
+}

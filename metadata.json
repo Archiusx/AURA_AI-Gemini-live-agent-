@@ -1,0 +1,8 @@
+{
+  "name": "Gemini Live Multimodal Agent",
+  "description": "A next-generation AI Agent leveraging Gemini Live API for real-time multimodal interaction (audio/vision) with integrated tools and Firestore persistence.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
