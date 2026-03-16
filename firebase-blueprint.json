@@ -1,0 +1,57 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user information and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user." },
+        "displayName": { "type": "string", "description": "The user's display name." },
+        "email": { "type": "string", "description": "The user's email address." },
+        "photoURL": { "type": "string", "description": "URL to the user's profile picture." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the profile was created." }
+      },
+      "required": ["uid", "email"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Stores a single interaction or session with the AI agent.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the conversation." },
+        "userId": { "type": "string", "description": "The ID of the user who owns this conversation." },
+        "title": { "type": "string", "description": "A short title for the conversation." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the conversation started." },
+        "lastMessageAt": { "type": "string", "format": "date-time", "description": "When the last message was sent." }
+      },
+      "required": ["userId", "createdAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "A single message within a conversation.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string", "description": "The ID of the parent conversation." },
+        "role": { "type": "string", "enum": ["user", "model"], "description": "Who sent the message." },
+        "content": { "type": "string", "description": "The text content of the message." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the message was sent." },
+        "type": { "type": "string", "enum": ["text", "audio", "image"], "description": "The type of content." }
+      },
+      "required": ["conversationId", "role", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents."
+    },
+    "conversations/{conversationId}": {
+      "schema": "Conversation",
+      "description": "Conversation metadata."
+    },
+    "conversations/{conversationId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Messages within a conversation."
+    }
+  }
+}
